@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - microservice
+  products:
+    container_name: products-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ENV=dev
+    depends_on:
+      - db
+    networks:
+      - microservice
+    ports:
+      - 5000:5000
+networks:
+  microservice:
+    driver: bridge
